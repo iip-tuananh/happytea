@@ -5,6 +5,9 @@
 @section('description')
 {{$config->web_des}}
 @endsection
+@section('image')
+{{url(''.$banners[0]->image->path)}}
+@endsection
 @section('css')
 <link rel='stylesheet'
         href='/site/css/callbuttom.css'
@@ -380,7 +383,7 @@
             </style>
         </section>
         @endforeach
-        
+
         <section class="section" id="section_773858533">
             <div class="bg section-bg fill bg-fill  bg-loaded"></div>
             <div class="section-content relative">

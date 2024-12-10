@@ -102,7 +102,7 @@
         </div>
         <hr>
         <div class="form-group text-center mb-4">
-            <label class="form-label">Ảnh banner(1903x595px)</label>
+            <label class="form-label">Ảnh banner(1530x420px)</label>
             <div class="main-img-preview">
                 <p class="help-block-img">* Ảnh định dạng: jpg, png không quá 2MB.</p>
                 <img class="thumbnail img-preview" ng-src="<% form.banner.path %>">
