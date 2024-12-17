@@ -275,7 +275,7 @@
 
         .header-bg-color {
             background-color: #CFE1B9;
-            background-image: url('/site/images/bg-header.jpg');
+            background-image: url('/site/images/bg-header1.jpg');
             background-repeat: no-repeat; /* Không lặp */
             background-position: center center; /* Đặt vị trí */
             background-size: cover; /* Kích thước */
