@@ -274,7 +274,11 @@
         }
 
         .header-bg-color {
-            background-color: #CFE1B9
+            background-color: #CFE1B9;
+            background-image: url('/site/images/bg-header.jpg');
+            background-repeat: no-repeat; /* Không lặp */
+            background-position: center center; /* Đặt vị trí */
+            background-size: cover; /* Kích thước */
         }
 
         .header-bottom {
@@ -980,6 +984,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
 
     @stack('script')
+    <script>
+        jQuery(document).ready(function(){
+                jQuery('.popup-youtube').on('click', function(){
+                    let url = jQuery(this).data('href');
+                    let embedUrl = '';
+
+                    // Kiểm tra nếu chuỗi chứa "http", nghĩa là một URL đầy đủ
+                    if (url.startsWith('http') || url.startsWith('https')) {
+                        // Nếu là URL đầy đủ, thay thế 'watch?v=' bằng 'embed/'
+                        embedUrl = url.replace("watch?v=", "embed/");
+                    } else {
+                        // Nếu chỉ là mã video, tạo URL nhúng YouTube
+                        embedUrl = 'https://www.youtube.com/embed/' + url;
+                    }
+                    console.log(embedUrl);
+
+                    jQuery('#popup-youtube-view .popmake-content').html('<iframe width="100%" height="365" src="' + embedUrl + '" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>');
+                    jQuery('#popup-youtube-view').addClass('show');
+                });
+            }
+        )
+        function closePopupView() {
+            jQuery('#popup-youtube-view').removeClass('show');
+        }
+    </script>
 </head>
 
 <body ng-app="App" ng-cloak
@@ -1044,22 +1073,26 @@
         </div>
     </template> --}}
     @include('site.partials.mobile_menu')
-    {{-- <div id="pum-27453" role="dialog" aria-modal="false"
-        class="pum pum-overlay pum-theme-10904 pum-theme-lightbox popmake-overlay auto_open click_open"
-        data-popmake="{&quot;id&quot;:27453,&quot;slug&quot;:&quot;popup-qua-tang-doanh-nghiep&quot;,&quot;theme_id&quot;:10904,&quot;cookies&quot;:[{&quot;event&quot;:&quot;on_popup_close&quot;,&quot;settings&quot;:{&quot;name&quot;:&quot;pum-27453&quot;,&quot;key&quot;:&quot;&quot;,&quot;session&quot;:null,&quot;path&quot;:true,&quot;time&quot;:&quot;3 minutes&quot;}}],&quot;triggers&quot;:[{&quot;type&quot;:&quot;auto_open&quot;,&quot;settings&quot;:{&quot;cookie_name&quot;:[&quot;pum-27453&quot;],&quot;delay&quot;:&quot;2000&quot;}},{&quot;type&quot;:&quot;click_open&quot;,&quot;settings&quot;:{&quot;extra_selectors&quot;:&quot;&quot;,&quot;cookie_name&quot;:null}}],&quot;mobile_disabled&quot;:null,&quot;tablet_disabled&quot;:null,&quot;meta&quot;:{&quot;display&quot;:{&quot;stackable&quot;:false,&quot;overlay_disabled&quot;:false,&quot;scrollable_content&quot;:false,&quot;disable_reposition&quot;:false,&quot;size&quot;:&quot;small&quot;,&quot;responsive_min_width&quot;:&quot;0%&quot;,&quot;responsive_min_width_unit&quot;:false,&quot;responsive_max_width&quot;:&quot;600px&quot;,&quot;responsive_max_width_unit&quot;:false,&quot;custom_width&quot;:&quot;640px&quot;,&quot;custom_width_unit&quot;:false,&quot;custom_height&quot;:&quot;380px&quot;,&quot;custom_height_unit&quot;:false,&quot;custom_height_auto&quot;:false,&quot;location&quot;:&quot;center&quot;,&quot;position_from_trigger&quot;:false,&quot;position_top&quot;:&quot;100&quot;,&quot;position_left&quot;:&quot;0&quot;,&quot;position_bottom&quot;:&quot;0&quot;,&quot;position_right&quot;:&quot;0&quot;,&quot;position_fixed&quot;:false,&quot;animation_type&quot;:&quot;fade&quot;,&quot;animation_speed&quot;:&quot;350&quot;,&quot;animation_origin&quot;:&quot;center top&quot;,&quot;overlay_zindex&quot;:false,&quot;zindex&quot;:&quot;1999999999&quot;},&quot;close&quot;:{&quot;text&quot;:&quot;&quot;,&quot;button_delay&quot;:&quot;0&quot;,&quot;overlay_click&quot;:false,&quot;esc_press&quot;:false,&quot;f4_press&quot;:false},&quot;click_open&quot;:[],&quot;convert_on&quot;:&quot;link_click&quot;}}">
-        <div id="popmake-27453"
+    <div id="popup-youtube-view" role="dialog" aria-modal="false"
+        class="pum pum-overlay pum-theme-10904 pum-theme-lightbox popmake-overlay auto_open click_open">
+        <div id="popup-youtube-content"
             class="pum-container popmake theme-10904 pum-responsive pum-responsive-small responsive size-small">
-            <div class="pum-content popmake-content" tabindex="0">
-                <p><a href="https://winecellar.vn/qua-tang-doanh-nghiep/"><img fetchpriority="high" decoding="async"
-                            class="alignnone size-large wp-image-52370"
-                            src="https://winecellar.vn/wp-content/uploads/2022/08/popup-qtdn-2025-800x800.jpg" alt=""
-                            width="800" height="800" /></a></p>
+            <div class="pum-content popmake-content">
+
             </div>
-            <button type="button" class="pum-close popmake-close" aria-label="Close">
+            <button type="button" class="pum-close popmake-close" onclick="closePopupView()" aria-label="Close">
                 × </button>
         </div>
-    </div> --}}
-    <div id="pum-45571" role="dialog" aria-modal="false"
+    </div>
+    <style>
+        .show {
+            display: block !important;
+        }
+        #popup-youtube-content {
+            height: 368px;
+        }
+    </style>
+    {{-- <div id="pum-45571" role="dialog" aria-modal="false"
         class="pum pum-overlay pum-theme-10904 pum-theme-lightbox popmake-overlay click_open"
         data-popmake="{&quot;id&quot;:45571,&quot;slug&quot;:&quot;workshop&quot;,&quot;theme_id&quot;:10904,&quot;cookies&quot;:[],&quot;triggers&quot;:[{&quot;type&quot;:&quot;click_open&quot;,&quot;settings&quot;:{&quot;extra_selectors&quot;:&quot;&quot;}}],&quot;mobile_disabled&quot;:null,&quot;tablet_disabled&quot;:null,&quot;meta&quot;:{&quot;display&quot;:{&quot;stackable&quot;:false,&quot;overlay_disabled&quot;:false,&quot;scrollable_content&quot;:false,&quot;disable_reposition&quot;:false,&quot;size&quot;:&quot;medium&quot;,&quot;responsive_min_width&quot;:&quot;0%&quot;,&quot;responsive_min_width_unit&quot;:false,&quot;responsive_max_width&quot;:&quot;600px&quot;,&quot;responsive_max_width_unit&quot;:false,&quot;custom_width&quot;:&quot;640px&quot;,&quot;custom_width_unit&quot;:false,&quot;custom_height&quot;:&quot;380px&quot;,&quot;custom_height_unit&quot;:false,&quot;custom_height_auto&quot;:false,&quot;location&quot;:&quot;center top&quot;,&quot;position_from_trigger&quot;:false,&quot;position_top&quot;:&quot;100&quot;,&quot;position_left&quot;:&quot;0&quot;,&quot;position_bottom&quot;:&quot;0&quot;,&quot;position_right&quot;:&quot;0&quot;,&quot;position_fixed&quot;:false,&quot;animation_type&quot;:&quot;fade&quot;,&quot;animation_speed&quot;:&quot;350&quot;,&quot;animation_origin&quot;:&quot;center top&quot;,&quot;overlay_zindex&quot;:false,&quot;zindex&quot;:&quot;1999999999&quot;},&quot;close&quot;:{&quot;text&quot;:&quot;&quot;,&quot;button_delay&quot;:&quot;0&quot;,&quot;overlay_click&quot;:false,&quot;esc_press&quot;:false,&quot;f4_press&quot;:false},&quot;click_open&quot;:[]}}">
         <div id="popmake-45571"
@@ -1145,7 +1178,7 @@
             <button type="button" class="pum-close popmake-close" aria-label="Close">
                 × </button>
         </div>
-    </div>
+    </div> --}}
     {{-- <div id="pum-28562" role="dialog" aria-modal="false"
         class="pum pum-overlay pum-theme-10904 pum-theme-lightbox popmake-overlay click_open"
         data-popmake="{&quot;id&quot;:28562,&quot;slug&quot;:&quot;popup-gift-bao-gia&quot;,&quot;theme_id&quot;:10904,&quot;cookies&quot;:[],&quot;triggers&quot;:[{&quot;type&quot;:&quot;click_open&quot;,&quot;settings&quot;:{&quot;extra_selectors&quot;:&quot;.gci-price a&quot;}}],&quot;mobile_disabled&quot;:null,&quot;tablet_disabled&quot;:null,&quot;meta&quot;:{&quot;display&quot;:{&quot;stackable&quot;:false,&quot;overlay_disabled&quot;:false,&quot;scrollable_content&quot;:false,&quot;disable_reposition&quot;:false,&quot;size&quot;:&quot;medium&quot;,&quot;responsive_min_width&quot;:&quot;0%&quot;,&quot;responsive_min_width_unit&quot;:false,&quot;responsive_max_width&quot;:&quot;450px&quot;,&quot;responsive_max_width_unit&quot;:false,&quot;custom_width&quot;:&quot;640px&quot;,&quot;custom_width_unit&quot;:false,&quot;custom_height&quot;:&quot;380px&quot;,&quot;custom_height_unit&quot;:false,&quot;custom_height_auto&quot;:false,&quot;location&quot;:&quot;center&quot;,&quot;position_from_trigger&quot;:false,&quot;position_top&quot;:&quot;100&quot;,&quot;position_left&quot;:&quot;0&quot;,&quot;position_bottom&quot;:&quot;0&quot;,&quot;position_right&quot;:&quot;0&quot;,&quot;position_fixed&quot;:false,&quot;animation_type&quot;:&quot;fade&quot;,&quot;animation_speed&quot;:&quot;350&quot;,&quot;animation_origin&quot;:&quot;center top&quot;,&quot;overlay_zindex&quot;:false,&quot;zindex&quot;:&quot;1999999999&quot;},&quot;close&quot;:{&quot;text&quot;:&quot;&quot;,&quot;button_delay&quot;:&quot;0&quot;,&quot;overlay_click&quot;:false,&quot;esc_press&quot;:false,&quot;f4_press&quot;:false},&quot;click_open&quot;:[]}}">

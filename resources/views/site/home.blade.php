@@ -412,7 +412,7 @@
                         <div class="col-inner">
                             <div class="box has-hover box-img-cat  has-hover box-text-bottom">
                                 <div class="box-image">
-                                    <a href="javascript:void(0)" data-href="{{$partner->link}}">
+                                    <a href="javascript:void(0)" data-href="{{$partner->link}}" class="popup-youtube">
                                         <div class="image-cover" style="padding-top:75%;">
                                             <img loading="lazy" decoding="async" width="507" height="340"
                                                 src="{{$partner->image->path}}"
