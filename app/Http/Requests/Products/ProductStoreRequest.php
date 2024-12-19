@@ -30,7 +30,7 @@ class ProductStoreRequest extends BaseRequest
             'intro' => 'nullable',
             'short_des' => 'nullable',
             'body' => 'nullable',
-            'base_price' => 'nullable|integer|min:' . $this->input('price'),
+            'base_price' => 'nullable|integer',
             'price' => 'nullable|integer',
             'status' =>'required|in:0,1',
             'image' => 'required|file|mimes:jpg,jpeg,png|max:3000',
