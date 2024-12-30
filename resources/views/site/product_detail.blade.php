@@ -15,11 +15,31 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
+    .product-attribute-values {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .product-attribute-values .badge, .product-attribute-values .badge+ .badge {
+        width: auto;
+        border: 1px solid #056839;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        color: #056839;
+        height: 30px;
+        cursor: pointer;
+        pointer-events: auto;
+    }
+    .product-attribute-values .badge.active {
+        background-color: #056839;
+        color: #fff;
+    }
 </style>
 @endsection
 
 @section('content')
-<main id="main" class="single-product">
+<main id="main" class="single-product" ng-controller="ProductDetailController">
     <div class="shop-container">
         <div class="container">
             <div class="woocommerce-notices-wrapper"></div>
@@ -162,7 +182,7 @@
                                             <div class="product-price-container is-normal">
                                                 <div class="price-wrapper">
                                                     <p class="price product-page-price ">
-                                                        <span class="woocommerce-Price-amount amount"><bdi>{{ formatCurrency($product->price) }}&nbsp;<span
+                                                        <span class="woocommerce-Price-amount amount"><bdi><% price | number %>&nbsp;<span
                                                                     class="woocommerce-Price-currencySymbol">&#8363;</span></bdi></span>
                                                     </p>
                                                 </div>
@@ -207,12 +227,23 @@
                                         <div class="product-price-container is-normal">
                                             <div class="price-wrapper">
                                                 <p class="price product-page-price ">
-                                                    <span class="woocommerce-Price-amount amount"><bdi>{{ formatCurrency($product->price) }}&nbsp;<span
+                                                    <span class="woocommerce-Price-amount amount"><bdi><% price | number %>&nbsp;<span
                                                                 class="woocommerce-Price-currencySymbol">&#8363;</span></bdi></span>
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
+                                    @if($product->attributeValues->count() > 0)
+                                    <div class="mt-2">
+                                        <label>Phân loại</label>
+                                        <div class="product-attribute-values">
+                                            @foreach ($product->attributeValues as $attribute)
+                                                <div class="badge badge-primary" data-value="{{ $attribute->pivot->value }}" data-name="{{ $attribute->name }}">{{ $attribute->name }} - {{ formatCurrency($attribute->pivot->value) }}&nbsp;<span
+                                                    class="woocommerce-Price-currencySymbol">&#8363;</span></div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endif
                                     <div class="add-to-cart-container form-minimal is-small">
                                         <form class="cart" enctype='multipart/form-data'>
                                             <div class="ux-quantity quantity buttons_added form-minimal">
@@ -226,7 +257,7 @@
                                                 <input type="button" value="+"
                                                     class="ux-quantity__button ux-quantity__button--plus button plus is-form">
                                             </div>
-                                            <button type="submit" name="add-to-cart" value="39323"
+                                            <button type="button" ng-click="addToCartFromProductDetail()"
                                                 class="single_add_to_cart_button button alt">Thêm vào giỏ
                                                 hàng</button>
                                         </form>
@@ -309,7 +340,7 @@
                                             Sản phẩm tương tự
                                         </h3>
                                         <div
-                                            class="row row-solid has-equal-box-heights equalize-box large-columns-4 medium-columns-3 small-columns-1 row-small">
+                                            class="row row-solid has-equal-box-heights equalize-box large-columns-4 medium-columns-3 small-columns-1 row-small item_product_main">
                                             @foreach ($productsRelated as $item)
                                                 @include('site.product_item', ['product' => $item])
                                             @endforeach
@@ -333,4 +364,72 @@
 @endsection
 
 @push('script')
+<script>
+    app.controller('ProductDetailController', function($scope, $http, $interval, cartItemSync, $rootScope, $compile) {
+        $scope.product = @json($product);
+
+        $scope.price = $scope.product.price;
+        $scope.selectedAttribute = null;
+        jQuery(document).ready(function() {
+            jQuery('.product-attribute-values .badge').click(function() {
+                jQuery('.product-attribute-values .badge').removeClass('active');
+                jQuery(this).addClass('active');
+                $scope.selectedAttribute = jQuery(this).data('name');
+                $scope.selectedAttributeValue = jQuery(this).data('value');
+                $scope.price = jQuery(this).data('value');
+                $scope.$apply();
+            });
+        });
+
+        $scope.form = {
+            quantity: 1
+        };
+
+        $scope.addToCartFromProductDetail = function() {
+            let quantity = jQuery('form input[name="quantity"]').val();
+            let attribute_name = $scope.selectedAttribute;
+            let attribute_value = $scope.selectedAttributeValue;
+            url = "{{route('cart.add.item', ['productId' => 'productId'])}}";
+            url = url.replace('productId', $scope.product.id);
+
+            jQuery.ajax({
+                type: 'POST',
+                url: url,
+                headers: {
+                    'X-CSRF-TOKEN': "{{csrf_token()}}"
+                },
+                data: {
+                    'qty': parseInt(quantity),
+                    'attribute_name': attribute_name,
+                    'attribute_value': attribute_value,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        if (response.count > 0) {
+                            $scope.hasItemInCart = true;
+                        }
+
+                        $interval.cancel($rootScope.promise);
+
+                        $rootScope.promise = $interval(function () {
+                            cartItemSync.items = response.items;
+                            cartItemSync.total = response.total;
+                            cartItemSync.count = response.count;
+                        }, 1000);
+
+                        console.log(cartItemSync);
+
+                        toastr.success('Thao tác thành công !')
+                    }
+                },
+                error: function () {
+                    toastr.error('Thao tác thất bại !')
+                },
+                complete: function () {
+                    $scope.$applyAsync();
+                }
+            });
+        }
+    });
+</script>
 @endpush

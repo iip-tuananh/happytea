@@ -13,81 +13,6 @@
                                 alt="{{ $product->name }}"
                                 decoding="async" loading="lazy" style="width:100%"/> </a>
                     </div>
-                    {{-- <div class="wcl-product__info">
-                        <div class="product-attribute product-attribute-v">
-                            <ul>
-                                <li class="product-attribute__item pa_giong-nho">
-                                    <div class="pa-icon">
-                                        <img src="https://winecellar.vn/wp-content/themes/winecellarvn/assets/icons/svg/pa_giong-nho.svg"
-                                            alt="Giống nho" />
-                                    </div>
-                                    <div class="pa-info">
-                                        <div class="pa-info__value">
-                                            <p><a href="https://winecellar.vn/giong-nho/primitivo/"
-                                                    rel="tag">Primitivo</a></p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="product-attribute__item pa_loai-vang">
-                                    <div class="pa-icon">
-                                        <img src="https://winecellar.vn/wp-content/themes/winecellarvn/assets/icons/svg/pa_loai-vang.svg"
-                                            alt="Loại vang" />
-                                    </div>
-                                    <div class="pa-info">
-                                        <div class="pa-info__value">
-                                            <p><a href="https://winecellar.vn/loai-vang/ruou-vang-do/"
-                                                    rel="tag">Rượu Vang Đỏ</a></p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="product-attribute__item pa_nha-san-xuat">
-                                    <div class="pa-icon">
-                                        <img src="https://winecellar.vn/wp-content/themes/winecellarvn/assets/icons/svg/pa_nha-san-xuat.svg"
-                                            alt="Nhà sản xuất" />
-                                    </div>
-                                    <div class="pa-info">
-                                        <div class="pa-info__value">
-                                            <p><a href="https://winecellar.vn/nha-san-xuat/san-marzano/"
-                                                    rel="tag">San Marzano</a></p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="product-attribute__item pa_quoc-gia">
-                                    <div class="pa-icon">
-                                        <img src="https://winecellar.vn/wp-content/themes/winecellarvn/assets/icons/svg/pa_quoc-gia.svg"
-                                            alt="Quốc gia" />
-                                    </div>
-                                    <div class="pa-info">
-                                        <div class="pa-info__value">
-                                            <p>Vang Ý (Italy)</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="product-attribute__item pa_nong-do">
-                                    <div class="pa-icon">
-                                        <img src="https://winecellar.vn/wp-content/themes/winecellarvn/assets/icons/svg/pa_nong-do.svg"
-                                            alt="Nồng độ" />
-                                    </div>
-                                    <div class="pa-info">
-                                        <div class="pa-info__value">
-                                            <p>1% ABV*</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="product-attribute__item pa_dung-tich">
-                                    <div class="pa-icon">
-                                        <img src="https://winecellar.vn/wp-content/themes/winecellarvn/assets/icons/svg/pa_dung-tich.svg"
-                                            alt="Dung tích" />
-                                    </div>
-                                    <div class="pa-info">
-                                        <div class="pa-info__value">
-                                            <p>750ml</p>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div> --}}
                 </div>
                 <div class="wcl-product-title">
                     <div class="title-wrapper">
@@ -108,7 +33,7 @@
                     </div>
                     <div class="wcl-button w-50 text-right">
                         <a class="button primary is-small"
-                            href="javascript:void(0)" onclick="addToCart({{ $product->id }})">Mua
+                            href="javascript:void(0)" ng-click="addToCart({{ $product->id }})">Mua
                             ngay</a>
                     </div>
                 </div>

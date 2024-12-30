@@ -2590,7 +2590,7 @@
             </div>
         </div>
     </button>
-    <div class="content content-second">
+    {{-- <div class="content content-second">
         <div class="wrap">
             <div class="sidebar sidebar-second">
                 <div class="sidebar-content">
@@ -2598,7 +2598,7 @@
                         <div class="order-summary-sections">
                             <div class="order-summary-section order-summary-section-discount"
                                 data-order-summary-section="discount">
-                                {{-- <form id="form_discount_add"> --}}
+                                <form id="form_discount_add">
                                     <div class="fieldset">
                                         <div class="field  ">
                                             <div class="field-input-btn-wrapper">
@@ -2617,7 +2617,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                {{-- </form> --}}
+                                </form>
                             </div>
                             <div class="order-summary-section order-summary-section-display-discount"
                                 data-order-summary-section="discount-display">
@@ -2666,7 +2666,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="content">
         <div class="wrap">
             <div class="sidebar">
@@ -2700,6 +2700,7 @@
                                             </td>
                                             <td class="product-description">
                                                 <span class="product-description-name order-summary-emphasis"><% item.name %></span>
+                                                <div ng-if="item.attributes.attribute_name" style="font-size: 12px; color: #666;">Phân loại: <span style="font-weight: 500; font-size: 14px; color: #056839;"><% item.attributes.attribute_name %></span></div>
                                             </td>
                                             <td class="product-quantity visually-hidden"><% item.quantity | number %></td>
                                             <td class="product-price">
@@ -2709,9 +2710,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="order-summary-section order-summary-section-discount"
+                            {{-- <div class="order-summary-section order-summary-section-discount"
                                 data-order-summary-section="discount">
-                                {{-- <form id="form_discount_add"> --}}
+                                <form id="form_discount_add">
                                     <div class="fieldset">
                                         <div class="field  ">
                                             <div class="field-input-btn-wrapper">
@@ -2730,7 +2731,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                {{-- </form> --}}
+                                </form>
                             </div>
                             <div class="order-summary-section order-summary-section-display-discount"
                                 data-order-summary-section="discount-display">
@@ -2752,7 +2753,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="order-summary-section order-summary-section-total-lines payment-lines"
                                 data-order-summary-section="payment-lines">
                                 <table class="total-line-table">
@@ -3121,9 +3122,9 @@
                             </div>
                         </div>
                         <div class="step-footer" id="step-footer-checkout">
-                            <button type="submit" class="step-footer-continue-btn btn" ng-click="submitOrder()">
+                            <button type="submit" class="step-footer-continue-btn btn" ng-click="submitOrder()" ng-disabled="loading">
                                 <span class="btn-content">Hoàn tất đơn hàng</span>
-                                <i class="btn-spinner icon icon-button-spinner"></i>
+                                <i class="btn-spinner icon icon-button-spinner" ng-class="{'btn-loading': loading}"></i>
                             </button>
                             <a class="step-footer-previous-link" href="{{ route('cart.index') }}">
                                 Giỏ hàng
@@ -3131,7 +3132,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="hrv-coupons-popup">
+                {{-- <div class="hrv-coupons-popup">
                     <div class="hrv-title-coupons-popup">
                         <p>Chọn giảm giá <span class="count-coupons"></span></p>
                         <div class="hrv-coupons-close-popup">
@@ -3209,7 +3210,7 @@
                         <div class="hrv-discount-code-external">
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 <div class="hrv-coupons-popup-site-overlay"></div>
                 <div class="main-footer footer-powered-by">Powered by {{ $config->web_title }}</div>
             </div>
@@ -3224,6 +3225,7 @@
             $scope.provinces = @json($provinces);
             $scope.districts = @json($districts);
             $scope.wards = @json($wards);
+            $scope.loading = false;
 
             $scope.form = {
                 customer_province: '',
@@ -3285,6 +3287,7 @@
             }
 
             $scope.submitOrder = function() {
+                $scope.loading = true;
                 let data = $scope.form;
                 data.discount_code = $scope.discount.code;
                 data.discount_value = $scope.discount.value;
@@ -3305,10 +3308,12 @@
                         } else {
                             $scope.errors = response.errors;
                             toastr.error(response.message);
+                            $scope.loading = false;
                         }
                     },
                     error: function(response) {
                         toastr.error('Thao tác thất bại');
+                        $scope.loading = false;
                     },
                     complete: function() {
                         $scope.$applyAsync();

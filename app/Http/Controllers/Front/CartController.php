@@ -39,16 +39,19 @@ class CartController extends Controller
     public function addItem(Request $request, $productId)
     {
         $product = Product::query()->find($productId);
+        $uniqueId = $request->attribute_name ? $product->id . '_' . $request->attribute_name : $product->id;
 
         \Cart::add([
-            'id' => $product->id,
+            'id' => $uniqueId,
             'name' => $product->name,
-            'price' => $product->price,
+            'price' => is_numeric($request->attribute_value) ? $request->attribute_value : $product->price,
             'quantity' => $request->qty ? (int)$request->qty : 1,
             'attributes' => [
                 'image' => $product->image->path ?? '',
                 'slug' => $product->slug,
                 'base_price' => $product->base_price,
+                'attribute_name' =>$request->attribute_name,
+                'attribute_value'=>$request->attribute_value
             ]
         ]);
 
@@ -158,17 +161,18 @@ class CartController extends Controller
                 'discount_code' => $request->discount_code,
                 'discount_value' => $request->discount_value,
                 'total_before_discount' => $total_price,
-                'total_after_discount' => $total_price - $request->discount_value,
+                'total_after_discount' => $total_price - ($request->discount_value ?? 0),
                 'code' => 'ORDER' . date('Ymd') . '-' . $lastId
             ]);
 
             foreach ($request->items as $item) {
                 $detail = new OrderDetail();
                 $detail->order_id = $order->id;
-                $detail->product_id = $item['id'];
+                $product_id = is_numeric($item['id']) ? $item['id'] : Product::query()->where('slug', $item['attributes']['slug'])->first()->id;
+                $detail->product_id = $product_id;
                 $detail->qty = $item['quantity'];
                 $detail->price = $item['price'];
-
+                $detail->type = $item['attributes']['attribute_name'] ?? null;
                 $detail->save();
             }
 

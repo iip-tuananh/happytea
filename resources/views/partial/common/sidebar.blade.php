@@ -67,6 +67,12 @@
                             <p>Thêm mới hàng hóa</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('attributes.index') }}" class="nav-link {{ Request::routeIs('attributes.index') ? 'active' : '' }}">
+                            <i class="far fas  fa-angle-right nav-icon"></i>
+                            <p>Danh mục thuộc tính hàng hóa</p>
+                        </a>
+                    </li>
                     {{-- <li class="nav-item">
                         <a href="{{ route('product_rates.index') }}" class="nav-link {{ Request::routeIs('product_rates.index') ? 'active' : '' }}">
                             <i class="far fas  fa-angle-right nav-icon"></i>
@@ -252,7 +258,7 @@
                 </ul>
             </li>
 
-            <li class="nav-item has-treeview  {{ request()->is('admin/reviews') || request()->is('admin/reviews*') ? 'menu-open' : '' }} ">
+            {{-- <li class="nav-item has-treeview  {{ request()->is('admin/reviews') || request()->is('admin/reviews*') ? 'menu-open' : '' }} ">
                 <a href="{{ route('Review.index') }}" class="nav-link">
                     <i class="nav-icon fas fa-star"></i>
                     <p>
@@ -260,7 +266,7 @@
                         <i class="fas fa-angle-left right"></i>
                     </p>
                 </a>
-            </li>
+            </li> --}}
 
             {{-- <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">

@@ -2131,9 +2131,9 @@
                                     </td>
                                     <td class="product-description">
                                     <span class="product-description-name order-summary-emphasis">{{$detail->product->name}}</span>
-                                    <span class="product-description-variant order-summary-small-text">
-                                    {{$detail->product->name}}
-                                    </span>
+                                    <div class="product-description-variant order-summary-small-text">
+                                        {{$detail->type}}
+                                    </div>
                                     </td>
                                     <td class="product-quantity visually-hidden">{{$detail->qty}}</td>
                                     <td class="product-price">

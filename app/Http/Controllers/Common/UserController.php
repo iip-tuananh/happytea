@@ -55,9 +55,9 @@ class UserController extends Controller
 				if ($object->canEdit()) {
 					$result = '<a href="' . route($this->route.'.edit',$object->id) .'" title="Sửa" class="btn btn-sm btn-primary edit"><i class="fas fa-pencil-alt"></i></a> ';
 				}
-				if ($object->canDelete()) {
-					$result .= '<a href="' . route($this->route.'.delete', $object->id) . '" title="Khóa" class="btn btn-sm btn-danger confirm"><i class="fas fa-times"></i></a>';
-				}
+				// if ($object->canDelete()) {
+				// 	$result .= '<a href="' . route($this->route.'.delete', $object->id) . '" title="Khóa" class="btn btn-sm btn-danger confirm"><i class="fas fa-times"></i></a>';
+				// }
 				return $result;
 
             })

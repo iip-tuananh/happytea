@@ -2,24 +2,12 @@
 <html lang="vi" class="loading-site no-js">
 
 <head>
-    <meta charset="UTF-8" />
-    <link rel="profile" href="http://gmpg.org/xfn/11" />
-    <link rel="pingback" href="https://winecellar.vn/xmlrpc.php" />
-    <script
-        src="data:text/javascript;base64,ZG9jdW1lbnQuZG9jdW1lbnRFbGVtZW50LmNsYXNzTmFtZT1kb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuY2xhc3NOYW1lKycgeWVzLWpzIGpzX2FjdGl2ZSBqcyc="
-        defer></script>
-    <script
-        src="data:text/javascript;base64,KGZ1bmN0aW9uKGh0bWwpe2h0bWwuY2xhc3NOYW1lPWh0bWwuY2xhc3NOYW1lLnJlcGxhY2UoL1xibm8tanNcYi8sJ2pzJyl9KShkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQp"
-        defer></script>
-    <meta name='robots' content='max-image-preview:large' />
     <style>
         img:is([sizes="auto" i], [sizes^="auto," i]) {
             contain-intrinsic-size: 3000px 1500px
         }
     </style>
     @include('site.partials.head')
-    <link rel='dns-prefetch' href='//fonts.googleapis.com' />
-    <link href='https://fonts.gstatic.com' crossorigin rel='preconnect' />
     <link rel='prefetch' href='/site/js/flatsome.js?ver=039f9485eef603e7c53a' />
     <link rel='prefetch' href='/site/js/chunk.slider.js?ver=3.18.0' />
     <link rel='prefetch' href='/site/js/chunk.popups.js?ver=3.18.0' />
@@ -140,16 +128,6 @@
             color: #dc3232;
         }
     </style>
-    <script
-        src="data:text/javascript;base64,KGZ1bmN0aW9uKHcsZCxzLGwsaSl7d1tsXT13W2xdfHxbXTt3W2xdLnB1c2goeydndG0uc3RhcnQnOm5ldyBEYXRlKCkuZ2V0VGltZSgpLGV2ZW50OidndG0uanMnfSk7dmFyIGY9ZC5nZXRFbGVtZW50c0J5VGFnTmFtZShzKVswXSxqPWQuY3JlYXRlRWxlbWVudChzKSxkbD1sIT0nZGF0YUxheWVyJz8nJmw9JytsOicnO2ouYXN5bmM9ITA7ai5zcmM9J2h0dHBzOi8vd3d3Lmdvb2dsZXRhZ21hbmFnZXIuY29tL2d0bS5qcz9pZD0nK2krZGw7Zi5wYXJlbnROb2RlLmluc2VydEJlZm9yZShqLGYpfSkod2luZG93LGRvY3VtZW50LCdzY3JpcHQnLCdkYXRhTGF5ZXInLCdHVE0tTUc1V0RHTScp"
-        defer></script>
-    <script src="https://www.googletagmanager.com/gtag/js?id=G-L999PJ766J" defer data-deferred="1"></script>
-    <script
-        src="data:text/javascript;base64,d2luZG93LmRhdGFMYXllcj13aW5kb3cuZGF0YUxheWVyfHxbXTtmdW5jdGlvbiBndGFnKCl7ZGF0YUxheWVyLnB1c2goYXJndW1lbnRzKX0KZ3RhZygnanMnLG5ldyBEYXRlKCkpO2d0YWcoJ2NvbmZpZycsJ0ctTDk5OVBKNzY2Sicp"
-        defer></script>
-    <script
-        src="data:text/javascript;base64,Z3RhZygnY29uZmlnJywnQVctODAyNTkwNzY2LzBYNDJDTnZUaklZQkVLNmcydjRDJyx7J3Bob25lX2NvbnZlcnNpb25fbnVtYmVyJzonMDk0NjY5ODAwOCd9KQ=="
-        defer></script>
     <noscript>
         <style>
             .woocommerce-product-gallery {
@@ -1008,10 +986,152 @@
         function closePopupView() {
             jQuery('#popup-youtube-view').removeClass('show');
         }
+
+        app.factory('cartItemSync', function ($interval) {
+            var cart = {items: null, total: null};
+
+            cart.items = @json($cartItems);
+            cart.count = {{$cartItems->sum('quantity')}};
+            cart.total = {{$totalPriceCart}};
+
+            return cart;
+        });
+
+        app.controller('AppController', function($rootScope, $scope, cartItemSync, $interval, $compile){
+            $scope.cart = cartItemSync;
+
+            $scope.changeQty = function (qty, product_id) {
+                updateCart(qty, product_id)
+            }
+
+            $scope.incrementQuantity = function (product) {
+                product.quantity = Math.min(product.quantity + 1, 9999);
+            };
+
+            $scope.decrementQuantity = function (product) {
+                product.quantity = Math.max(product.quantity - 1, 0);
+            };
+
+            // var container = angular.element(document.getElementsByClassName('item_product_main'));
+            // $compile(container.contents())($scope);
+
+            $scope.addToCart = function (productId, quantity = 1) {
+                url = "{{route('cart.add.item', ['productId' => 'productId'])}}";
+                url = url.replace('productId', productId);
+                let item_qty = quantity;
+
+                jQuery.ajax({
+                    type: 'POST',
+                    url: url,
+                    headers: {
+                        'X-CSRF-TOKEN': "{{csrf_token()}}"
+                    },
+                    data: {
+                        'qty': parseInt(item_qty)
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            if (response.count > 0) {
+                                $scope.hasItemInCart = true;
+                            }
+
+                            $interval.cancel($rootScope.promise);
+
+                            $rootScope.promise = $interval(function () {
+                                cartItemSync.items = response.items;
+                                cartItemSync.total = response.total;
+                                cartItemSync.count = response.count;
+                            }, 1000);
+                            toastr.success('Thao tác thành công !')
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Thao tác thất bại !')
+                    },
+                    complete: function () {
+                        $scope.$applyAsync();
+                    }
+                });
+            }
+
+            function updateCart(qty, product_id) {
+                jQuery.ajax({
+                    type: 'POST',
+                    url: "{{route('cart.update.item')}}",
+                    headers: {
+                        'X-CSRF-TOKEN': "{{csrf_token()}}"
+                    },
+                    data: {
+                        product_id: product_id,
+                        qty: qty
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            $scope.items = response.items;
+                            $scope.total = response.total;
+                            $scope.total_qty = response.count;
+                            $interval.cancel($rootScope.promise);
+
+                            $rootScope.promise = $interval(function(){
+                                cartItemSync.items = response.items;
+                                cartItemSync.total = response.total;
+                                cartItemSync.count = response.count;
+                            }, 1000);
+
+                            $scope.$applyAsync();
+                        }
+                    },
+                    error: function (e) {
+                        toastr.error('Đã có lỗi xảy ra');
+                    },
+                    complete: function () {
+                        $scope.$applyAsync();
+                    }
+                });
+            }
+
+            // xóa item trong giỏ
+            $scope.removeItem = function (product_id) {
+                jQuery.ajax({
+                    type: 'GET',
+                    url: "{{route('cart.remove.item')}}",
+                    data: {
+                        product_id: product_id
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            $scope.cart.items = response.items;
+                            $scope.cart.count = Object.keys($scope.cart.items).length;
+                            $scope.cart.totalCost = response.total;
+
+                            $interval.cancel($rootScope.promise);
+
+                            $rootScope.promise = $interval(function(){
+                                cartItemSync.items = response.items;
+                                cartItemSync.total = response.total;
+                                cartItemSync.count = response.count;
+                            }, 1000);
+
+                            if ($scope.cart.count == 0) {
+                                $scope.hasItemInCart = false;
+                            }
+                            $scope.$applyAsync();
+                        }
+                    },
+                    error: function (e) {
+                        jQuery.toast.error('Đã có lỗi xảy ra');
+                    },
+                    complete: function () {
+                        $scope.$applyAsync();
+                    }
+                });
+            }
+
+        })
     </script>
 </head>
 
-<body ng-app="App" ng-cloak
+<body ng-app="App" ng-cloak ng-controller="AppController"
     class="home page-template page-template-page-blank page-template-page-blank-php page page-id-35556 theme-flatsome woocommerce-no-js full-width lightbox nav-dropdown-has-arrow nav-dropdown-has-shadow mobile-submenu-slide mobile-submenu-slide-levels-2 mobile-submenu-toggle">
 
     <div id="wrapper">
@@ -1019,59 +1139,6 @@
         @yield('content')
         @include('site.partials.footer')
     </div>
-    {{-- <template id="tmpl-age-gate">
-        <div class="age-gate-wrapper">
-            <div class="age-gate-loader">
-                <svg version="1.1" id="L5" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                    x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-                    <circle fill="currentColor" stroke="none" cx="6" cy="50" r="6">
-                        <animateTransform attributeName="transform" dur="1s" type="translate"
-                            values="0 15 ; 0 -15; 0 15" repeatCount="indefinite" begin="0.1" />
-                    </circle>
-                    <circle fill="currentColor" stroke="none" cx="30" cy="50" r="6">
-                        <animateTransform attributeName="transform" dur="1s" type="translate"
-                            values="0 10 ; 0 -10; 0 10" repeatCount="indefinite" begin="0.2" />
-                    </circle>
-                    <circle fill="currentColor" stroke="none" cx="54" cy="50" r="6">
-                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 5 ; 0 -5; 0 5"
-                            repeatCount="indefinite" begin="0.3" />
-                    </circle>
-                </svg>
-            </div>
-            <div class="age-gate-background-color"></div>
-            <div class="age-gate-background"></div>
-            <div class="age-gate" role="dialog" aria-modal="true" aria-label="QUÝ KHÁCH ĐÃ ĐỦ 18 TUỔI?">
-                <form method="post" class="age-gate-form">
-                    <div class="age-gate-heading">
-                        <img src="https://winecellar.vn/wp-content/uploads/2021/07/Winecellar-Logo-120721-1.png"
-                            alt="WINECELLAR.vn" class="age-gate-heading-title age-gate-heading-title-logo" />
-                    </div>
-                    <p class="age-gate-subheadline">
-                        Vui lòng cung cấp thông tin.
-                    </p>
-                    <div class="age-gate-fields">
-                        <p class="age-gate-challenge">
-                            QUÝ KHÁCH ĐÃ ĐỦ 18 TUỔI?
-                        </p>
-                        <div class="age-gate-buttons">
-                            <button type="submit" class="age-gate-submit age-gate-submit-yes" data-submit="yes"
-                                value="1" name="age_gate[confirm]">Đủ 18 tuổi</button>
-                            <button class="age-gate-submit age-gate-submit-no" data-submit="no" value="0"
-                                name="age_gate[confirm]" type="submit">Chưa đủ 18 tuổi</button>
-                        </div>
-                    </div>
-                    <input type="hidden" name="age_gate[age]" value="9MRd26N84fSy3NwprhoXtg==" />
-                    <input type="hidden" name="age_gate[nonce]" value="4ae8a78307" /><input type="hidden"
-                        name="_wp_http_referer" value="/" /><input type="hidden" name="age_gate[lang]" value="vi" />
-                    <input type="hidden" name="age_gate[confirm]" />
-                    <div class="age-gate-errors"></div>
-                    <div class="age-gate-additional-information">
-                        <p><em>Website chỉ giới thiệu sản phẩm rượu vang đến đối tượng trên 18 tuổi.</em></p>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </template> --}}
     @include('site.partials.mobile_menu')
     <div id="popup-youtube-view" role="dialog" aria-modal="false"
         class="pum pum-overlay pum-theme-10904 pum-theme-lightbox popmake-overlay auto_open click_open">
@@ -1092,366 +1159,6 @@
             height: 368px;
         }
     </style>
-    {{-- <div id="pum-45571" role="dialog" aria-modal="false"
-        class="pum pum-overlay pum-theme-10904 pum-theme-lightbox popmake-overlay click_open"
-        data-popmake="{&quot;id&quot;:45571,&quot;slug&quot;:&quot;workshop&quot;,&quot;theme_id&quot;:10904,&quot;cookies&quot;:[],&quot;triggers&quot;:[{&quot;type&quot;:&quot;click_open&quot;,&quot;settings&quot;:{&quot;extra_selectors&quot;:&quot;&quot;}}],&quot;mobile_disabled&quot;:null,&quot;tablet_disabled&quot;:null,&quot;meta&quot;:{&quot;display&quot;:{&quot;stackable&quot;:false,&quot;overlay_disabled&quot;:false,&quot;scrollable_content&quot;:false,&quot;disable_reposition&quot;:false,&quot;size&quot;:&quot;medium&quot;,&quot;responsive_min_width&quot;:&quot;0%&quot;,&quot;responsive_min_width_unit&quot;:false,&quot;responsive_max_width&quot;:&quot;600px&quot;,&quot;responsive_max_width_unit&quot;:false,&quot;custom_width&quot;:&quot;640px&quot;,&quot;custom_width_unit&quot;:false,&quot;custom_height&quot;:&quot;380px&quot;,&quot;custom_height_unit&quot;:false,&quot;custom_height_auto&quot;:false,&quot;location&quot;:&quot;center top&quot;,&quot;position_from_trigger&quot;:false,&quot;position_top&quot;:&quot;100&quot;,&quot;position_left&quot;:&quot;0&quot;,&quot;position_bottom&quot;:&quot;0&quot;,&quot;position_right&quot;:&quot;0&quot;,&quot;position_fixed&quot;:false,&quot;animation_type&quot;:&quot;fade&quot;,&quot;animation_speed&quot;:&quot;350&quot;,&quot;animation_origin&quot;:&quot;center top&quot;,&quot;overlay_zindex&quot;:false,&quot;zindex&quot;:&quot;1999999999&quot;},&quot;close&quot;:{&quot;text&quot;:&quot;&quot;,&quot;button_delay&quot;:&quot;0&quot;,&quot;overlay_click&quot;:false,&quot;esc_press&quot;:false,&quot;f4_press&quot;:false},&quot;click_open&quot;:[]}}">
-        <div id="popmake-45571"
-            class="pum-container popmake theme-10904 pum-responsive pum-responsive-medium responsive size-medium">
-            <div class="pum-content popmake-content" tabindex="0">
-                <section class="section" id="section_616465788">
-                    <div class="bg section-bg fill bg-fill  bg-loaded"></div>
-                    <div class="section-content relative">
-                        <div class="row" id="row-468552905">
-                            <div id="col-37121175" class="col small-12 large-12">
-                                <div class="col-inner">
-                                    <div id="text-44258706" class="text">
-                                        <h3>Đăng ký tham gia workshop chuyên sâu về ly rượu vang</h3>
-                                        <style>
-                                            #text-44258706 {
-                                                text-align: center;
-                                            }
-                                        </style>
-                                    </div>
-                                    <div class="wpcf7 no-js" id="wpcf7-f45572-o1" lang="vi" dir="ltr"
-                                        data-wpcf7-id="45572">
-                                        <div class="screen-reader-response">
-                                            <p role="status" aria-live="polite" aria-atomic="true"></p>
-                                            <ul></ul>
-                                        </div>
-                                        <form action="/#wpcf7-f45572-o1" method="post" class="wpcf7-form init"
-                                            aria-label="Form liên hệ" novalidate="novalidate" data-status="init">
-                                            <div style="display: none;">
-                                                <input type="hidden" name="_wpcf7" value="45572" />
-                                                <input type="hidden" name="_wpcf7_version" value="6.0.1" />
-                                                <input type="hidden" name="_wpcf7_locale" value="vi" />
-                                                <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f45572-o1" />
-                                                <input type="hidden" name="_wpcf7_container_post" value="0" />
-                                                <input type="hidden" name="_wpcf7_posted_data_hash" value="" />
-                                            </div>
-                                            <p><label>Họ và tên*</label><br />
-                                                <span class="wpcf7-form-control-wrap" data-name="your-name"><input
-                                                        size="40" maxlength="400"
-                                                        class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
-                                                        aria-required="true" aria-invalid="false" value="" type="text"
-                                                        name="your-name" /></span><br />
-                                                <label>Số điện thoại*</label><br />
-                                                <span class="wpcf7-form-control-wrap" data-name="your-phone"><input
-                                                        size="40" maxlength="400"
-                                                        class="wpcf7-form-control wpcf7-tel wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-tel"
-                                                        aria-required="true" aria-invalid="false" value="" type="tel"
-                                                        name="your-phone" /></span><br />
-                                                <label>Email</label><br />
-                                                <span class="wpcf7-form-control-wrap" data-name="your-email"><input
-                                                        size="40" maxlength="400"
-                                                        class="wpcf7-form-control wpcf7-email wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-email"
-                                                        aria-required="true" aria-invalid="false" value="" type="email"
-                                                        name="your-email" /></span>
-                                            </p>
-                                            <p><input class="wpcf7-form-control wpcf7-submit has-spinner button"
-                                                    type="submit" value="Đăng ký" /></p>
-                                            <p style="display: none !important;" class="akismet-fields-container"
-                                                data-prefix="_wpcf7_ak_">
-                                                <label>&#916;<textarea name="_wpcf7_ak_hp_textarea" cols="45" rows="8"
-                                                        maxlength="100"></textarea></label><input type="hidden"
-                                                    id="ak_js_1" name="_wpcf7_ak_js" value="190" />
-                                                <script
-                                                    src="data:text/javascript;base64,ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoImFrX2pzXzEiKS5zZXRBdHRyaWJ1dGUoInZhbHVlIiwobmV3IERhdGUoKSkuZ2V0VGltZSgpKQ=="
-                                                    defer></script>
-                                            </p>
-                                            <input type='hidden' class='wpcf7-pum'
-                                                value='{"closepopup":false,"closedelay":0,"openpopup":false,"openpopup_id":0}' />
-                                            <div class="wpcf7-response-output" aria-hidden="true"></div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <style>
-                        #section_616465788 {
-                            padding-top: 30px;
-                            padding-bottom: 30px;
-                        }
-                    </style>
-                </section>
-            </div>
-            <button type="button" class="pum-close popmake-close" aria-label="Close">
-                × </button>
-        </div>
-    </div> --}}
-    {{-- <div id="pum-28562" role="dialog" aria-modal="false"
-        class="pum pum-overlay pum-theme-10904 pum-theme-lightbox popmake-overlay click_open"
-        data-popmake="{&quot;id&quot;:28562,&quot;slug&quot;:&quot;popup-gift-bao-gia&quot;,&quot;theme_id&quot;:10904,&quot;cookies&quot;:[],&quot;triggers&quot;:[{&quot;type&quot;:&quot;click_open&quot;,&quot;settings&quot;:{&quot;extra_selectors&quot;:&quot;.gci-price a&quot;}}],&quot;mobile_disabled&quot;:null,&quot;tablet_disabled&quot;:null,&quot;meta&quot;:{&quot;display&quot;:{&quot;stackable&quot;:false,&quot;overlay_disabled&quot;:false,&quot;scrollable_content&quot;:false,&quot;disable_reposition&quot;:false,&quot;size&quot;:&quot;medium&quot;,&quot;responsive_min_width&quot;:&quot;0%&quot;,&quot;responsive_min_width_unit&quot;:false,&quot;responsive_max_width&quot;:&quot;450px&quot;,&quot;responsive_max_width_unit&quot;:false,&quot;custom_width&quot;:&quot;640px&quot;,&quot;custom_width_unit&quot;:false,&quot;custom_height&quot;:&quot;380px&quot;,&quot;custom_height_unit&quot;:false,&quot;custom_height_auto&quot;:false,&quot;location&quot;:&quot;center&quot;,&quot;position_from_trigger&quot;:false,&quot;position_top&quot;:&quot;100&quot;,&quot;position_left&quot;:&quot;0&quot;,&quot;position_bottom&quot;:&quot;0&quot;,&quot;position_right&quot;:&quot;0&quot;,&quot;position_fixed&quot;:false,&quot;animation_type&quot;:&quot;fade&quot;,&quot;animation_speed&quot;:&quot;350&quot;,&quot;animation_origin&quot;:&quot;center top&quot;,&quot;overlay_zindex&quot;:false,&quot;zindex&quot;:&quot;1999999999&quot;},&quot;close&quot;:{&quot;text&quot;:&quot;&quot;,&quot;button_delay&quot;:&quot;0&quot;,&quot;overlay_click&quot;:false,&quot;esc_press&quot;:false,&quot;f4_press&quot;:false},&quot;click_open&quot;:[]}}">
-        <div id="popmake-28562"
-            class="pum-container popmake theme-10904 pum-responsive pum-responsive-medium responsive size-medium">
-            <div class="pum-content popmake-content" tabindex="0">
-                <section class="section" id="section_83411165">
-                    <div class="bg section-bg fill bg-fill  bg-loaded"></div>
-                    <div class="section-content relative">
-                        <div class="row" id="row-1449011284">
-                            <div id="col-1277767088" class="col small-12 large-12">
-                                <div class="col-inner">
-                                    <div id="text-3337381547" class="text">
-                                        <h3 class="tv-title">Nhận tư vấn quà tặng doanh nghiệp</h3>
-                                        <style>
-                                            #text-3337381547 {
-                                                text-align: center;
-                                                color: rgb(114, 0, 0);
-                                            }
-
-                                            #text-3337381547>* {
-                                                color: rgb(114, 0, 0);
-                                            }
-                                        </style>
-                                    </div>
-                                    <div class="wpcf7 no-js" id="wpcf7-f28492-o2" lang="vi" dir="ltr"
-                                        data-wpcf7-id="28492">
-                                        <div class="screen-reader-response">
-                                            <p role="status" aria-live="polite" aria-atomic="true"></p>
-                                            <ul></ul>
-                                        </div>
-                                        <form action="/#wpcf7-f28492-o2" method="post" class="wpcf7-form init"
-                                            aria-label="Form liên hệ" novalidate="novalidate" data-status="init">
-                                            <div style="display: none;">
-                                                <input type="hidden" name="_wpcf7" value="28492" />
-                                                <input type="hidden" name="_wpcf7_version" value="6.0.1" />
-                                                <input type="hidden" name="_wpcf7_locale" value="vi" />
-                                                <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f28492-o2" />
-                                                <input type="hidden" name="_wpcf7_container_post" value="0" />
-                                                <input type="hidden" name="_wpcf7_posted_data_hash" value="" />
-                                            </div>
-                                            <p><label><span class="wpcf7-form-control-wrap" data-name="your-name"><input
-                                                            size="40" maxlength="400"
-                                                            class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
-                                                            aria-required="true" aria-invalid="false"
-                                                            placeholder="Họ và tên" value="" type="text"
-                                                            name="your-name" /></span></label><br />
-                                                <label><span class="wpcf7-form-control-wrap"
-                                                        data-name="your-company"><input size="40" maxlength="400"
-                                                            class="wpcf7-form-control wpcf7-text" aria-invalid="false"
-                                                            placeholder="Tên công ty" value="" type="text"
-                                                            name="your-company" /></span></label><br />
-                                                <label><span class="wpcf7-form-control-wrap"
-                                                        data-name="your-phone"><input size="40" maxlength="400"
-                                                            class="wpcf7-form-control wpcf7-tel wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-tel"
-                                                            aria-required="true" aria-invalid="false"
-                                                            placeholder="Số điện thoại" value="" type="tel"
-                                                            name="your-phone" /></span></label><br />
-                                                <label><span class="wpcf7-form-control-wrap"
-                                                        data-name="your-email"><input size="40" maxlength="400"
-                                                            class="wpcf7-form-control wpcf7-email wpcf7-text wpcf7-validates-as-email"
-                                                            aria-invalid="false" placeholder="Địa chỉ email" value=""
-                                                            type="email" name="your-email" /></span></label>
-                                            </p>
-                                            <div class="text-center">
-                                                <p><input class="wpcf7-form-control wpcf7-submit has-spinner button"
-                                                        type="submit" value="Nhận tư vấn" /></p>
-                                            </div>
-                                            <p style="display: none !important;" class="akismet-fields-container"
-                                                data-prefix="_wpcf7_ak_">
-                                                <label>&#916;<textarea name="_wpcf7_ak_hp_textarea" cols="45" rows="8"
-                                                        maxlength="100"></textarea></label><input type="hidden"
-                                                    id="ak_js_2" name="_wpcf7_ak_js" value="240" />
-                                                <script
-                                                    src="data:text/javascript;base64,ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoImFrX2pzXzIiKS5zZXRBdHRyaWJ1dGUoInZhbHVlIiwobmV3IERhdGUoKSkuZ2V0VGltZSgpKQ=="
-                                                    defer></script>
-                                            </p>
-                                            <input type='hidden' class='wpcf7-pum'
-                                                value='{"closepopup":false,"closedelay":0,"openpopup":false,"openpopup_id":0}' />
-                                            <div class="wpcf7-response-output" aria-hidden="true"></div>
-                                        </form>
-                                    </div>
-                                    <div id="text-920912812" class="text">
-                                        <p>Hoặc liên hệ với chúng tôi theo:</p>
-                                        <p>Hotline: <a href="tel:0946698008">094 669 8008</a></p>
-                                        <p>Email: <a href="mailto:info@winecellar.vn">info@winecellar.vn</a></p>
-                                        <style>
-                                            #text-920912812 {
-                                                font-size: 1rem;
-                                                line-height: 0.75;
-                                            }
-                                        </style>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <style>
-                        #section_83411165 {
-                            padding-top: 30px;
-                            padding-bottom: 30px;
-                            background-color: rgb(220, 204, 169);
-                        }
-                    </style>
-                </section>
-            </div>
-            <button type="button" class="pum-close popmake-close" aria-label="Close">
-                × </button>
-        </div>
-    </div> --}}
-    {{-- <section class="section ss-fixed" id="section_380326108">
-        <div class="bg section-bg fill bg-fill  bg-loaded"></div>
-        <div class="section-content relative">
-            <div class="row row-collapse" id="row-1326982847">
-                <div id="col-1337203961" class="col small-12 large-12">
-                    <div class="col-inner">
-                        <div id="stack-2763111169"
-                            class="stack ss-fixed-contact stack-row justify-around items-stretch">
-                            <a class="plain" href="https://winecellar.vn/lien-he/he-thong-cua-hang/">
-                                <div class="icon-box featured-box icon-box-left text-left">
-                                    <div class="icon-box-img" style="width: 20px">
-                                        <div class="icon">
-                                            <div class="icon-inner">
-                                                <img width="18" height="25"
-                                                    src="https://winecellar.vn/wp-content/uploads/2022/03/icon_map.png"
-                                                    class="attachment-medium size-medium" alt="" decoding="async"
-                                                    loading="lazy" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="icon-box-text last-reset">
-                                        <h5 class="uppercase">Tìm cửa hàng</h5>
-                                    </div>
-                                </div>
-                            </a>
-                            <a class="plain" href="#modalUuDai">
-                                <div class="icon-box featured-box box-middle icon-box-left text-left">
-                                    <div class="icon-box-img" style="width: 24px">
-                                        <div class="icon">
-                                            <div class="icon-inner">
-                                                <img width="25" height="24"
-                                                    src="https://winecellar.vn/wp-content/uploads/2022/03/icon_gift.png"
-                                                    class="attachment-medium size-medium" alt="" decoding="async"
-                                                    loading="lazy" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="icon-box-text last-reset">
-                                        <h5 class="uppercase">Nhận ưu đãi</h5>
-                                    </div>
-                                </div>
-                            </a>
-                            <a class="plain" href="https://winecellar.vn/qua-tang-doanh-nghiep/">
-                                <div class="icon-box featured-box icon-box-left text-left">
-                                    <div class="icon-box-img" style="width: 20px">
-                                        <div class="icon">
-                                            <div class="icon-inner">
-                                                <img width="25" height="24"
-                                                    src="https://winecellar.vn/wp-content/uploads/2022/03/icon_gift.png"
-                                                    class="attachment-medium size-medium" alt="" decoding="async"
-                                                    loading="lazy" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="icon-box-text last-reset">
-                                        <h5 class="uppercase">Quà Tặng Doanh Nghiệp</h5>
-                                    </div>
-                                </div>
-                            </a>
-                            <style>
-                                #stack-2763111169>* {
-                                    --stack-gap: 0rem;
-                                }
-                            </style>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <style>
-            #section_380326108 {
-                padding-top: 12px;
-                padding-bottom: 12px;
-                background-color: rgb(255, 255, 255);
-            }
-        </style>
-    </section> --}}
-    {{-- <div id="modalUuDai" class="lightbox-by-id lightbox-content mfp-hide lightbox-white "
-        style="max-width:800px ;padding:0">
-        <div class="row row-collapse row-full-width" id="row-1928761384">
-            <div id="col-1425337973" class="col small-12 large-12">
-                <div class="col-inner text-center" style="background-color:rgb(153, 13, 35);">
-                    <div id="gap-311739375" class="gap-element clearfix" style="display:block; height:auto;">
-                        <style>
-                            #gap-311739375 {
-                                padding-top: 30px;
-                            }
-                        </style>
-                    </div>
-                    <div id="text-3989459772" class="text">
-                        <p>Vui lòng để lại thông tin của bạn.</p>
-                        <p>WINECELLAR.vn sẽ gửi ưu đãi cho quý khách</p>
-                        <style>
-                            #text-3989459772 {
-                                text-align: center;
-                                color: rgb(255, 255, 255);
-                            }
-
-                            #text-3989459772>* {
-                                color: rgb(255, 255, 255);
-                            }
-                        </style>
-                    </div>
-                    <div class="wpcf7 no-js" id="wpcf7-f9621-o3" lang="en-US" dir="ltr" data-wpcf7-id="9621">
-                        <div class="screen-reader-response">
-                            <p role="status" aria-live="polite" aria-atomic="true"></p>
-                            <ul></ul>
-                        </div>
-                        <form action="/#wpcf7-f9621-o3" method="post" class="wpcf7-form init" aria-label="Contact form"
-                            novalidate="novalidate" data-status="init">
-                            <div style="display: none;">
-                                <input type="hidden" name="_wpcf7" value="9621" />
-                                <input type="hidden" name="_wpcf7_version" value="6.0.1" />
-                                <input type="hidden" name="_wpcf7_locale" value="en_US" />
-                                <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f9621-o3" />
-                                <input type="hidden" name="_wpcf7_container_post" value="0" />
-                                <input type="hidden" name="_wpcf7_posted_data_hash" value="" />
-                            </div>
-                            <div class="form-modal">
-                                <p><span class="wpcf7-form-control-wrap" data-name="name-newsletter"><input size="40"
-                                            maxlength="400"
-                                            class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
-                                            aria-required="true" aria-invalid="false" placeholder="Họ và Tên (bắt buộc)"
-                                            value="" type="text" name="name-newsletter" /></span></p>
-                                <p><span class="wpcf7-form-control-wrap" data-name="sdt-newsletter"><input size="40"
-                                            maxlength="12" minlength="10"
-                                            class="wpcf7-form-control wpcf7-tel wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-tel"
-                                            aria-required="true" aria-invalid="false"
-                                            placeholder="Số điện thoại (bắt buộc)" value="" type="tel"
-                                            name="sdt-newsletter" /></span></p>
-                                <p><input class="wpcf7-form-control wpcf7-submit has-spinner" type="submit"
-                                        value="Nhận ưu đãi" /></p>
-                            </div>
-                            <p style="display: none !important;" class="akismet-fields-container"
-                                data-prefix="_wpcf7_ak_">
-                                <label>&#916;<textarea name="_wpcf7_ak_hp_textarea" cols="45" rows="8"
-                                        maxlength="100"></textarea></label><input type="hidden" id="ak_js_3"
-                                    name="_wpcf7_ak_js" value="222" />
-                                <script
-                                    src="data:text/javascript;base64,ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoImFrX2pzXzMiKS5zZXRBdHRyaWJ1dGUoInZhbHVlIiwobmV3IERhdGUoKSkuZ2V0VGltZSgpKQ=="
-                                    defer></script>
-                            </p>
-                            <input type='hidden' class='wpcf7-pum'
-                                value='{"closepopup":false,"closedelay":0,"openpopup":false,"openpopup_id":0}' />
-                            <div class="wpcf7-response-output" aria-hidden="true"></div>
-                        </form>
-                    </div>
-                    <div id="gap-779491481" class="gap-element clearfix" style="display:block; height:auto;">
-                        <style>
-                            #gap-779491481 {
-                                padding-top: 30px;
-                            }
-                        </style>
-                    </div>
-                </div>
-                <style>
-                    #col-1425337973>.col-inner {
-                        padding: 15px 20px 15px 20px;
-                    }
-                </style>
-            </div>
-        </div>
-    </div> --}}
     <div class="nav-social PC hide-for-medium">
         <ul>
             <li>

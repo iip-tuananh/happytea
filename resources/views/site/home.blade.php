@@ -304,36 +304,6 @@
                                                 class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
                                                 alt="{{ $product->name }}" /> </a>
                                     </div>
-                                    {{-- <div class="image-tools top right show-on-hover">
-                                        <div class="wishlist-icon">
-                                            <button class="wishlist-button button is-outline circle icon"
-                                                aria-label="Wishlist">
-                                                <i class="icon-heart"></i> </button>
-                                            <div class="wishlist-popup dark">
-                                                <div class="yith-wcwl-add-to-wishlist add-to-wishlist-13892 yith-wcwl-add-to-wishlist--button_default-style wishlist-fragment on-first-load"
-                                                    data-fragment-ref="13892"
-                                                    data-fragment-options="{&quot;base_url&quot;:&quot;&quot;,&quot;product_id&quot;:13892,&quot;parent_product_id&quot;:0,&quot;product_type&quot;:&quot;simple&quot;,&quot;is_single&quot;:false,&quot;in_default_wishlist&quot;:false,&quot;show_view&quot;:false,&quot;browse_wishlist_text&quot;:&quot;\u0110\u00e3 th\u00edch&quot;,&quot;already_in_wishslist_text&quot;:&quot;&quot;,&quot;product_added_text&quot;:&quot;&quot;,&quot;available_multi_wishlist&quot;:false,&quot;disable_wishlist&quot;:false,&quot;show_count&quot;:false,&quot;ajax_loading&quot;:false,&quot;loop_position&quot;:&quot;shortcode&quot;,&quot;item&quot;:&quot;add_to_wishlist&quot;}">
-                                                    <div class="yith-wcwl-add-button">
-                                                        <a href="?add_to_wishlist=13892&#038;_wpnonce=ba2b187597"
-                                                            class="add_to_wishlist single_add_to_wishlist alt button theme-button-style "
-                                                            data-product-id="13892" data-product-type="simple"
-                                                            data-original-product-id="0"
-                                                            data-title="Thêm vào yêu thích" rel="nofollow">
-                                                            <svg id="yith-wcwl-icon-star"
-                                                                class="yith-wcwl-icon-svg" fill="currentColor"
-                                                                viewBox="0 0 24 24"
-                                                                xmlns="http://www.w3.org/2000/svg">
-                                                                <path clip-rule="evenodd" fill-rule="evenodd"
-                                                                    d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z">
-                                                                </path>
-                                                            </svg>
-                                                            <span>Thêm vào yêu thích</span>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> --}}
                                     <div
                                         class="image-tools grid-tools text-center hide-for-small bottom hover-slide-in show-on-hover">
                                     </div>
@@ -353,10 +323,7 @@
                                         <a href="javascript:void(0)"
                                             data-quantity="1"
                                             class="primary is-small mb-0 button product_type_simple add_to_cart_button is-flat"
-                                            data-product_id="{{ $product->id }}" data-product_sku="{{ $product->sku }}"
-                                            aria-label="Thêm vào giỏ hàng: &ldquo;{{ $product->name }}&rdquo;"
-                                            rel="nofollow"
-                                            data-success_message="&ldquo;{{ $product->name }}&rdquo; đã được thêm vào giỏ hàng của bạn">Thêm
+                                            rel="nofollow" ng-click="addToCart({{ $product->id }})">Thêm
                                             vào giỏ hàng</a></div>
                                     <span id="woocommerce_loop_add_to_cart_link_describedby_13892"
                                         class="screen-reader-text">

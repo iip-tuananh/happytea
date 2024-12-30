@@ -262,6 +262,20 @@ class Product extends BaseModel
         $this->save();
     }
 
+    public function syncAttributes($attributes)
+    {
+        $this->attributeValues()->detach();
+        $syncData = [];
+        foreach ($attributes as $attribute) {
+            $syncData[$attribute['attribute_id']] = [
+                'value' => $attribute['value'],
+                'product_id' => $this->id,
+            ];
+        }
+
+        $this->attributeValues()->sync($syncData);
+    }
+
     public function syncGalleries($galleries)
     {
         if ($galleries) {

@@ -1,33 +1,5 @@
 <header id="header" class="header has-sticky sticky-jump">
     <div class="header-wrapper">
-        {{-- <div id="top-bar" class="header-top hide-for-sticky flex-has-center">
-            <div class="flex-row container">
-                <div class="flex-col hide-for-medium flex-left">
-                    <ul class="nav nav-left medium-nav-center nav-small  nav-divided"></ul>
-                </div>
-                <div class="flex-col hide-for-medium flex-center">
-                    <ul class="nav nav-center nav-small  nav-divided">
-                        <li class="html custom html_topbar_left">
-                            <p style="text-align: center;"> For foreign customers, please Get in touch with us
-                                on <a href="https://open.kakao.com/o/ss0MncDg"><strong>Kakaotalk</strong></a>
-                            </p>
-                        </li>
-                    </ul>
-                </div>
-                <div class="flex-col hide-for-medium flex-right">
-                    <ul class="nav top-bar-nav nav-right nav-small  nav-divided"></ul>
-                </div>
-                <div class="flex-col show-for-medium flex-grow">
-                    <ul class="nav nav-center nav-small mobile-nav  nav-divided">
-                        <li class="html custom html_topbar_left">
-                            <p style="text-align: center;"> For foreign customers, please Get in touch with us
-                                on <a href="https://open.kakao.com/o/ss0MncDg"><strong>Kakaotalk</strong></a>
-                            </p>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div> --}}
         <div id="masthead" class="header-main hide-for-sticky nav-dark">
             <div class="header-inner flex-row container logo-left medium-logo-center" role="navigation">
                 <div id="logo" class="flex-col logo">
@@ -96,11 +68,10 @@
                         </li>
                         <li class="header-divider"></li>
                         <li class="cart-item has-icon">
-                            <a href="https://winecellar.vn/cart/"
+                            <a href="{{route('cart.index')}}"
                                 class="header-cart-link is-small off-canvas-toggle nav-top-link" title="Giỏ hàng"
-                                data-open="#cart-popup" data-class="off-canvas-cart" data-pos="right"><i
-                                    class="icon-shopping-basket" data-icon-label="0">
-                                </i>
+                                data-open="#cart-popup" data-class="off-canvas-cart" data-pos="right">
+                                <i class="icon-shopping-basket" data-icon-label="<% cart.count %>"></i>
                             </a>
                             <div id="cart-popup" class="mfp-hide">
                                 <div class="cart-popup-inner inner-padding cart-popup-inner--sticky">
@@ -108,8 +79,52 @@
                                         <span class="heading-font uppercase">Giỏ hàng</span>
                                         <div class="is-divider"></div>
                                     </div>
-                                    <div class="widget woocommerce widget_shopping_cart">
-                                        <div class="widget_shopping_cart_content"></div>
+                                    <div class="widget woocommerce widget_shopping_cart" ng-if="cart.count > 0">
+                                        <div class="widget_shopping_cart_content">
+                                            <ul class="woocommerce-mini-cart cart_list product_list_widget ">
+                                                <li class="woocommerce-mini-cart-item mini_cart_item" ng-repeat="item in cart.items">
+                                                    <a href="javascript:void(0);" class="remove" ng-click="removeItem(item.id)">×</a>
+                                                    <a href="/san-pham/<% item.attributes.slug %>.html">
+                                                        <img width="300" height="400" ng-src="<% item.attributes.image %>" class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail" alt="<% item.name %>" decoding="async" loading="lazy"><% item.name %>
+                                                    </a>
+                                                    <div ng-if="item.attributes.attribute_name" style="font-size: 12px; color: #666;">Phân loại: <span style="font-weight: 500; font-size: 14px; color: #056839;"><% item.attributes.attribute_name %></span></div>
+                                                    <div class="ux-mini-cart-qty">
+                                                        <div class="ux-quantity quantity buttons_added">
+                                                        <input type="button" value="-" class="ux-quantity__button ux-quantity__button--minus button minus is-form" ng-click="changeQty(item.quantity, item.id)">
+                                                        <input type="number" class="input-text qty text" name="quantity" value="1" aria-label="Số lượng sản phẩm" size="4" min="0" max="" step="1" placeholder="" inputmode="numeric" autocomplete="off" ng-model="item.quantity" ng-change="changeQty(item.quantity, item.id)">
+                                                        <input type="button" value="+" class="ux-quantity__button ux-quantity__button--plus button plus is-form" ng-click="changeQty(item.quantity, item.id)">
+                                                        </div>
+                                                        <span class="product-subtotal price-wrapper" data-title="Tạm tính">
+                                                        <span class="woocommerce-Price-amount amount"><bdi><% item.price | number %>&nbsp;<span class="woocommerce-Price-currencySymbol">₫</span></bdi></span>				</span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                            <div class="ux-mini-cart-footer">
+                                                <p class="woocommerce-mini-cart__total total">
+                                                    <strong>Tổng:</strong> <span class="woocommerce-Price-amount amount"><bdi><% cart.total | number %>&nbsp;<span class="woocommerce-Price-currencySymbol">₫</span></bdi></span>
+                                                </p>
+                                                <p class="woocommerce-mini-cart__buttons buttons">
+                                                    <a href="{{route('cart.index')}}" class="button wc-forward">Xem giỏ hàng</a>
+                                                    <a href="{{route('cart.checkout')}}" class="button checkout wc-forward">Thanh toán</a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget woocommerce widget_shopping_cart" ng-if="cart.count == 0">
+                                        <div class="widget_shopping_cart_content">
+                                        <div class="ux-mini-cart-empty flex flex-row-col text-center pt pb">
+                                            <div class="ux-mini-cart-empty-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 19" style="opacity: .1;height:80px;">
+                                                    <path d="M8.5 0C6.7 0 5.3 1.2 5.3 2.7v2H2.1c-.3 0-.6.3-.7.7L0 18.2c0 .4.2.8.6.8h15.7c.4 0 .7-.3.7-.7v-.1L15.6 5.4c0-.3-.3-.6-.7-.6h-3.2v-2c0-1.6-1.4-2.8-3.2-2.8zM6.7 2.7c0-.8.8-1.4 1.8-1.4s1.8.6 1.8 1.4v2H6.7v-2zm7.5 3.4 1.3 11.5h-14L2.8 6.1h2.5v1.4c0 .4.3.7.7.7.4 0 .7-.3.7-.7V6.1h3.5v1.4c0 .4.3.7.7.7s.7-.3.7-.7V6.1h2.6z" fill-rule="evenodd" clip-rule="evenodd" fill="#303031"></path>
+                                                </svg>
+                                            </div>
+                                            <p class="woocommerce-mini-cart__empty-message empty">Chưa có sản phẩm trong giỏ hàng.</p>
+                                            <p class="return-to-shop">
+                                                <a class="button primary wc-backward" href="{{route('front.home-page')}}">
+                                                Quay trở lại cửa hàng				</a>
+                                            </p>
+                                        </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
