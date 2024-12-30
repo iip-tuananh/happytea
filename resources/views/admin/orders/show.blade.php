@@ -86,6 +86,7 @@
                             <tr>
                                 <th>STT</th>
                                 <th>Tên hàng hóa</th>
+                                <th>Phân loại</th>
                                 <th>Giá tiền</th>
                                 <th>Số lượng đặt mua</th>
                                 <th>Thành tiền</th>
@@ -95,6 +96,7 @@
                             <tr ng-repeat="detail in form.details track by $index">
                                 <td class="text-center"><% $index + 1 %></td>
                                 <td class="text-center"><% detail.product.name %></td>
+                                <td class="text-center"><% detail.type %></td>
                                 <td class="text-center"><% detail.product.price | number %></td>
                                 <td class="text-center"><% detail.qty | number %></td>
                                 <td class="text-right"><% (detail.qty * detail.price) | number %></td>
