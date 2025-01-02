@@ -66,3 +66,10 @@
         </ul>
     </div>
 </div>
+<style>
+    @media (max-width: 768px) {
+        #main-menu .sidebar-menu .nav-sidebar li a{
+            color: #ffffff;
+        }
+    }
+</style>

@@ -158,13 +158,13 @@
                                 <div class="box-image" style="width:20%;">
                                     <div class="">
                                         <img loading="lazy" decoding="async" width="80" height="80"
-                                            src="https://winecellar.vn/wp-content/uploads/2022/03/champagne-1.png"
+                                            src="{{asset('site/images/tea.png')}}"
                                             class="attachment-original size-original" alt="" />
                                     </div>
                                 </div>
                                 <div class="box-text text-center">
                                     <div class="box-text-inner">
-                                        <h4><span style="color: #056839;">2000 sản phẩm</span></h4>
+                                        <h4><span style="color: #056839;">+20 sản phẩm - hàng chính hãng</span></h4>
                                         <p><span style="font-size: 80%;">Nhập khẩu &amp; phân phối chính
                                                 hãng</span></p>
                                     </div>
@@ -177,8 +177,8 @@
                             <div class="box has-hover   has-hover box-text-bottom">
                                 <div class="box-image" style="width:20%;">
                                     <div class="">
-                                        <img loading="lazy" decoding="async" width="42" height="43"
-                                            src="https://winecellar.vn/wp-content/uploads/2023/06/gh-toan-quoc.png"
+                                        <img loading="lazy" decoding="async" width="42" height="40"
+                                            src="{{asset('site/images/gh-toan-quoc.png')}}"
                                             class="attachment-original size-original" alt="" />
                                     </div>
                                 </div>
@@ -198,7 +198,7 @@
                                 <div class="box-image" style="width:20%;">
                                     <div class="">
                                         <img loading="lazy" decoding="async" width="80" height="80"
-                                            src="https://winecellar.vn/wp-content/uploads/2022/03/delivery-1.png"
+                                            src="{{asset('site/images/delivery-1.png')}}"
                                             class="attachment-original size-original" alt="" />
                                     </div>
                                 </div>
@@ -218,7 +218,7 @@
                                 <div class="box-image" style="width:20%;">
                                     <div class="">
                                         <img loading="lazy" decoding="async" width="48" height="48"
-                                            src="https://winecellar.vn/wp-content/uploads/2023/06/check-correct.png"
+                                            src="{{asset('site/images/check-correct.png')}}"
                                             class="attachment-original size-original" alt="" />
                                     </div>
                                 </div>
