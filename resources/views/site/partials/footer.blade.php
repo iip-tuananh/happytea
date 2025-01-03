@@ -24,7 +24,7 @@
                                     line-height: 20px;"> Email: {{ $config->email }} </div>
                                 <div style="font-weight: 400;
                                     font-size: 14px; margin-bottom: 10px;
-                                    line-height: 20px;"> Thời gian làm việc: 0800 – 12h00  13h00-17h00 </div>
+                                    line-height: 20px;"> Thời gian làm việc: 08h00 – 11h45  13h00-17h15 </div>
                             </div>
                         </div>
                         <div class="container section-title-container">

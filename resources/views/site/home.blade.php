@@ -165,7 +165,7 @@
                                 <div class="box-text text-center">
                                     <div class="box-text-inner">
                                         <h4><span style="color: #056839;">+20 sản phẩm - hàng chính hãng</span></h4>
-                                        <p><span style="font-size: 80%;">Nhập khẩu &amp; phân phối chính
+                                        <p><span style="font-size: 80%;">Sản xuất &amp; phân phối chính
                                                 hãng</span></p>
                                     </div>
                                 </div>
