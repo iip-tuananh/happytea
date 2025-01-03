@@ -127,7 +127,7 @@
                             <p>Email : <strong><a
                                         href="mailto:{{ $config->email }}">{{ $config->email }}</a></strong>
                             </p>
-                            <p>Thời gian làm việc : <strong>0800 – 12h00  13h00-17h00</strong>
+                            <p>Thời gian làm việc : <strong>08h00 – 11h45  13h00-17h15</strong>
                             </p>
                             <div id="gap-101843187" class="gap-element clearfix"
                                 style="display:block; height:auto;">
