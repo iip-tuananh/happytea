@@ -140,7 +140,7 @@
                             <div id="search-lightbox" class="mfp-hide dark text-center">
                                 <div class="searchform-wrapper ux-search-box relative is-large">
                                     <form role="search" method="get" class="searchform"
-                                        action="https://winecellar.vn/">
+                                        action="">
                                         <div class="flex-row relative">
                                             <div class="flex-col flex-grow">
                                                 <label class="screen-reader-text"
@@ -163,7 +163,7 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="cart-item has-icon"><a href="https://winecellar.vn/cart/"
+                        <li class="cart-item has-icon"><a href=""
                                 class="header-cart-link is-small off-canvas-toggle nav-top-link" title="Giỏ hàng"
                                 data-open="#cart-popup" data-class="off-canvas-cart" data-pos="right"><i
                                     class="icon-shopping-basket" data-icon-label="0">
